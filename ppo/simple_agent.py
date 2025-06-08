@@ -1,10 +1,62 @@
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_checker import check_env
 import numpy as np
+import matplotlib.pyplot as plt
+from stable_baselines3.common.callbacks import BaseCallback
+import os
+import signal
+import sys
+from tensorboard.backend.event_processing import event_accumulator
+
 # 수정된 동적 환경을 임포트합니다.
 from rl_environment import ProductionLineEnv
 # config에서 최대 기계 대수 설정을 가져옵니다.
 from config import MAX_MACHINES_PER_STATION
+
+class CustomTensorboardCallback(BaseCallback):
+    """
+    학습 중 주기적으로 보상 및 손실을 기록하고, 학습 완료 시 그래프를 그리기 위한 콜백.
+    """
+    def __init__(self, save_path, verbose=0):
+        super(CustomTensorboardCallback, self).__init__(verbose)
+        self.save_path = save_path
+        self.episode_rewards = []
+        self.episode_losses = []
+        self.ep_rew_mean = 0
+        self.train_loss = 0
+
+    def _on_step(self) -> bool:
+        # PPO는 n_steps마다 한 번씩 학습을 업데이트하며, 그 시점에 loss가 계산됩니다.
+        # 따라서 loss는 바로 직전 스텝에서 갱신되지 않을 수 있습니다.
+        # 여기서는 info에서 loss를 직접 가져오기 어렵기 때문에, on_rollout_end에서 갱신된 값을 사용하거나
+        # Tensorboard 로그에서 직접 파싱하는 방식을 고려해야 합니다.
+        # SimplePPO Agent의 verbose=1 로그를 기반으로 값에 접근하는 것은 어려움이 있습니다.
+        # 실제 loss 값은 model.logger에서 접근 가능하지만, 여기서는 TensorBoard 로그 파싱으로 대체합니다.
+        return True
+
+    def _on_rollout_end(self) -> None:
+        """
+        새로운 롤아웃이 끝날 때마다 호출됩니다.
+        """
+        # Tensorboard 로그에서 최신 보상 및 손실 값을 가져옵니다.
+        try:
+            ea = event_accumulator.EventAccumulator(self.logger.dir)
+            ea.Reload()
+
+            if 'rollout/ep_rew_mean' in ea.Tags()['scalars']:
+                latest_rew_event = ea.Scalars('rollout/ep_rew_mean')[-1]
+                self.ep_rew_mean = latest_rew_event.value
+                self.episode_rewards.append((latest_rew_event.step, self.ep_rew_mean))
+
+            if 'train/loss' in ea.Tags()['scalars']:
+                latest_loss_event = ea.Scalars('train/loss')[-1]
+                self.train_loss = latest_loss_event.value
+                self.episode_losses.append((latest_loss_event.step, self.train_loss))
+
+        except Exception as e:
+            if self.verbose > 0:
+                print(f"Error reading TensorBoard logs in callback: {e}")
+            pass # 로그 파일이 아직 생성되지 않았거나 비어있을 수 있음
 
 class SimpleProductionAgent:
     """
@@ -16,6 +68,24 @@ class SimpleProductionAgent:
         self.env = ProductionLineEnv()
         self.model = None
         self.is_trained = False
+        self.tensorboard_log_dir = "./ppo_production_tensorboard/"
+        self.callback = None
+        self.trained_model_filename = "my_production_ai"
+
+        # 시그널 핸들러 설정
+        signal.signal(signal.SIGINT, self._signal_handler)
+
+    def _signal_handler(self, signum, frame):
+        print("\n🚨 Ctrl+C 감지! 학습을 중단하고 모델을 저장합니다.")
+        if self.is_trained or (self.model is not None and self.model.num_timesteps > 0):
+            self.save_model(self.trained_model_filename)
+            print("✅ 학습된 모델이 성공적으로 저장되었습니다.")
+            if self.callback:
+                self.plot_learning_curves(self.tensorboard_log_dir)
+                print("✅ 학습 그래프가 출력되었습니다.")
+        else:
+            print("⚠️ 학습 중이 아니거나 저장할 모델이 없습니다.")
+        sys.exit(0) # 프로그램 종료
 
     def train(self, total_timesteps):
         """AI 에이전트 학습"""
@@ -32,6 +102,7 @@ class SimpleProductionAgent:
         print(f"🧠 AI 학습 시작 (총 {total_timesteps} 스텝)")
 
         # PPO 알고리즘은 'MlpPolicy'를 통해 MultiDiscrete 행동 공간을 지원합니다.
+        # GPU 사용을 명시적으로 설정 (자동으로 사용 가능한 경우 GPU 사용)
         self.model = PPO(
             "MlpPolicy",
             self.env,
@@ -42,15 +113,92 @@ class SimpleProductionAgent:
             gamma=0.99,        # 미래 보상에 대한 할인율
             ent_coef=0.01,     # 탐험을 장려하기 위한 엔트로피 계수
             clip_range=0.2,    # PPO의 클리핑 범위
-            tensorboard_log="./ppo_production_tensorboard/" # 학습 과정을 텐서보드에 기록
+            tensorboard_log=self.tensorboard_log_dir, # 학습 과정을 텐서보드에 기록
+            device="auto"      # GPU가 사용 가능한 경우 GPU 사용, 아니면 CPU 사용
         )
+        
+        # 커스텀 콜백 인스턴스 생성
+        self.callback = CustomTensorboardCallback(save_path=self.tensorboard_log_dir)
 
         # 학습 실행
-        self.model.learn(total_timesteps=total_timesteps)
+        self.model.learn(total_timesteps=total_timesteps, callback=self.callback)
         self.is_trained = True
 
         print("🎉 학습 완료!")
         return True
+
+    def plot_learning_curves(self, log_dir, save_filename="learning_curves.png"):
+        """
+        TensorBoard 로그 파일에서 보상 및 손실 데이터를 읽어 그래프를 그립니다.
+        """
+        print("\n📈 학습 곡선 생성 중...")
+        event_file = None
+        for root, _, files in os.walk(log_dir):
+            for file in files:
+                if "events.out.tfevents" in file:
+                    event_file = os.path.join(root, file)
+                    break
+            if event_file:
+                break
+
+        if not event_file:
+            print(f"❌ TensorBoard 이벤트 파일을 찾을 수 없습니다: {log_dir}")
+            return
+
+        ea = event_accumulator.EventAccumulator(event_file)
+        ea.Reload()
+
+        rewards = []
+        losses = []
+        timesteps_reward = []
+        timesteps_loss = []
+
+        if 'rollout/ep_rew_mean' in ea.Tags()['scalars']:
+            for event in ea.Scalars('rollout/ep_rew_mean'):
+                timesteps_reward.append(event.step)
+                rewards.append(event.value)
+        else:
+            print("⚠️ 'rollout/ep_rew_mean' 데이터를 찾을 수 없습니다.")
+
+        if 'train/loss' in ea.Tags()['scalars']:
+            for event in ea.Scalars('train/loss'):
+                timesteps_loss.append(event.step)
+                losses.append(event.value)
+        else:
+            print("⚠️ 'train/loss' 데이터를 찾을 수 없습니다.")
+
+        if not rewards and not losses:
+            print("❌ 그래프를 그릴 데이터가 충분하지 않습니다.")
+            return
+
+        plt.figure(figsize=(12, 6))
+
+        if rewards:
+            plt.subplot(1, 2, 1)
+            plt.plot(timesteps_reward, rewards)
+            plt.title('Average Episode Reward over Timesteps')
+            plt.xlabel('Timesteps')
+            plt.ylabel('Average Reward')
+            plt.grid(True)
+
+        if losses:
+            plt.subplot(1, 2, 2)
+            plt.plot(timesteps_loss, losses)
+            plt.title('Training Loss over Timesteps')
+            plt.xlabel('Timesteps')
+            plt.ylabel('Loss')
+            plt.grid(True)
+
+        plt.tight_layout()
+
+        # 그래프 저장 기능 추가
+        save_path = os.path.join(log_dir, save_filename)
+        plt.savefig(save_path)
+        print(f"✅ 학습 그래프가 '{save_path}'에 저장되었습니다.")
+
+        plt.show()
+        print("✅ 학습 그래프가 표시되었습니다.")
+
 
     def test_agent(self, num_tests=5):
         """학습된 에이전트 성능 테스트"""
@@ -157,16 +305,16 @@ class SimpleProductionAgent:
         else:
             print("🤔 AI가 더 학습이 필요해 보입니다.")
 
-    def save_model(self, filename="production_agent"):
+    def save_model(self, filename):
         """학습된 모델 저장"""
-        if not self.is_trained:
+        if not self.is_trained and (self.model is None or self.model.num_timesteps == 0):
             print("❌ 저장할 모델이 없습니다!")
             return False
         self.model.save(filename)
         print(f"💾 모델이 '{filename}.zip'으로 저장되었습니다.")
         return True
 
-    def load_model(self, filename="production_agent"):
+    def load_model(self, filename="production_agent_trained"):
         """저장된 모델 불러오기"""
         try:
             self.model = PPO.load(filename, env=self.env)
@@ -190,7 +338,8 @@ if __name__ == "__main__":
 
     # 학습 실행 (시간을 늘려 더 나은 성능 기대)
     print("\n1️⃣ AI 학습 시작...")
-    success = agent.train(total_timesteps=100000)
+    # 시그널 핸들러를 통해 모델 저장 및 그래프 출력될 수 있도록 total_timesteps 조정
+    success = agent.train(total_timesteps=200000)
 
     if success:
         # 성능 테스트
@@ -203,4 +352,9 @@ if __name__ == "__main__":
 
         # 모델 저장
         print("\n4️⃣ 모델 저장...")
-        agent.save_model("my_production_ai")
+        agent.save_model(agent.trained_model_filename)
+
+        # 학습 곡선 출력
+        # 학습 곡선 출력 및 저장
+        print("\n5️⃣ 학습 곡선 출력 및 저장...")
+        agent.plot_learning_curves(agent.tensorboard_log_dir, save_filename="production_ai_learning_curves.png") # 파일명 지정
