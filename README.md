@@ -160,7 +160,8 @@ python training_analysis_v1.py
 - AI vs 랜덤 방식 비교 결과를 터미널과 그래프로 확인
 
 아래는 그래프 예시
-![training_reward_plot](https://github.com/user-attachments/assets/d95ab2e8-40f8-41e4-893f-45d6125430f9)
+![production_ai_learning_curves](https://github.com/user-attachments/assets/79ba37e2-2d76-4673-9489-772663ed14c7)
+
 
 ### 4. 설정 변경 (선택사항)
 ```python
@@ -373,7 +374,8 @@ python training_analysis_v1.py
 - View AI vs random approach comparison results in terminal and graphs
 
 Below is an example graph:
-![training_reward_plot](https://github.com/user-attachments/assets/d95ab2e8-40f8-41e4-893f-45d6125430f9)
+![production_ai_learning_curves](https://github.com/user-attachments/assets/23f0862b-ee29-43ef-ab11-abd802d9364e)
+
 
 ### 4. Configuration Changes (Optional)
 ```python
