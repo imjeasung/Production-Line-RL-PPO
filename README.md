@@ -11,10 +11,10 @@
 - **검증 방법**: AI 방식 vs 랜덤 선택 방식의 성능을 수치적으로 비교
 
 ### 📊 주요 성과 (실제 실행 결과)
-- **처리량**: AI가 랜덤 방식 대비 **15.5% 향상** (시간당 101.3개 vs 87.7개)
-- **운영비용**: AI가 랜덤 방식 대비 **48.8% 절감** ($3,760 vs $7,343)
-- **대기시간**: AI가 랜덤 방식 대비 **93.9% 단축** (0.15분 vs 2.40분)
-- **전체 보상**: AI가 랜덤 방식 대비 **93.8% 향상** (124.2 vs 64.1)
+- **처리량**: AI가 랜덤 방식 대비 **13.0% 향상** (시간당 생산량: AI 100.9개 vs 랜덤 89.3개)
+- **운영비용**: AI가 랜덤 방식 대비 **52.0% 절감** (AI $3,760 vs 랜덤 $7,828)
+- **대기시간**: AI가 랜덤 방식 대비 **92.3% 단축** (AI 0.16분 vs 랜덤 2.09분)
+- **전체 보상**: AI가 랜덤 방식 대비 **101.8% 향상** (AI 123.7 vs 랜덤 61.3)
 
 ## 🛠️ 기술 스택
 
@@ -230,18 +230,18 @@ apply_scenario('bottleneck_assembly')  # 병목 시나리오 적용
 
 ### 🎯 처리량 (Throughput)
 - **의미**: 시간당 완성품 생산 개수
-- **AI 성과**: 101.3개/시간 (랜덤: 87.7개/시간)
-- **비즈니스 임팩트**: 15.5% 생산성 향상 → 매출 직결
+- **AI 성과**: 시간당 생산량 100.9개 (랜덤: 89.3개/시간)
+- **비즈니스 임팩트**: 13.0% 생산성 향상 → 매출 직결
 
 ### 💰 운영비용 (Cost)
 - **의미**: 기계 운영에 필요한 총 비용
-- **AI 성과**: $3,760 (랜덤: $7,343)
-- **비즈니스 임팩트**: 48.8% 비용 절감 → 수익성 개선
+- **AI 성과**: AI의 평균 운영 비용은 $3,760으로, 랜덤 방식의 평균 비용($7,828) 대비 52.0% 낮았습니다. 특히 AI는 랜덤 방식이 최대 생산량을 기록했을 때의 최저 비용보다도 25.1% 더 낮은 비용 효율성을 보였습니다.
+- **비즈니스 임팩트**: 52.0% 비용 절감 → 수익성 개선
 
 ### ⏱️ 대기시간 (Wait Time)
 - **의미**: 부품이 각 공정에서 대기하는 평균 시간
-- **AI 성과**: 0.15분 (랜덤: 2.40분)
-- **비즈니스 임팩트**: 93.9% 대기시간 단축 → 고객 만족도 향상
+- **AI 성과**: 평균 0.16분 (랜덤: 2.09분)
+- **비즈니스 임팩트**: 92.3% 대기시간 단축 → 고객 만족도 향상
 
 ## 🎓 학습 가치
 
@@ -281,10 +281,10 @@ This project aims to **apply AI-powered optimization techniques to production li
 - **Validation Method**: Quantitative performance comparison between AI approach vs. random selection approach
 
 ### 📊 Key Performance Results (Actual Execution)
-- **Throughput**: AI achieved **15.5% improvement** over random approach (101.3 units/hour vs 87.7 units/hour)
-- **Operating Cost**: AI achieved **48.8% cost reduction** compared to random approach ($3,760 vs $7,343)
-- **Wait Time**: AI achieved **93.9% wait time reduction** compared to random approach (0.15 min vs 2.40 min)
-- **Overall Reward**: AI achieved **93.8% improvement** over random approach (124.2 vs 64.1)
+- **Throughput**: AI achieved **13.0% improvement** over random approach (AI 100.9 units/hour vs Random 89.3 units/hour)
+- **Operating Cost**: AI achieved **52.0% cost reduction** compared to random approach (AI $3,760 vs Random $7,828)
+- **Wait Time**: AI achieved **92.3% wait time reduction** compared to random approach (AI 0.16 min vs Random 2.09 min)
+- **Overall Reward**: AI achieved **101.8% improvement** over random approach (AI 123.7 vs Random 61.3)
 
 ## 🛠️ Technology Stack
 
@@ -445,18 +445,18 @@ apply_scenario('bottleneck_assembly')  # Apply bottleneck scenario
 
 ### 🎯 Throughput
 - **Meaning**: Number of finished products per hour
-- **AI Performance**: 101.3 units/hour (Random: 87.7 units/hour)
-- **Business Impact**: 15.5% productivity improvement → Direct revenue impact
+- **AI Performance**: 100.9 units/hour (Random: 89.3 units/hour)
+- **Business Impact**: 13.0% productivity improvement → Direct revenue impact
 
 ### 💰 Operating Cost
 - **Meaning**: Total cost required for machine operation
-- **AI Performance**: $3,760 (Random: $7,343)
-- **Business Impact**: 48.8% cost reduction → Profitability improvement
+- **AI Performance**: AI's average operating cost was $3,760, which was 52.0% lower than the random method's average cost ($7,828). Notably, AI demonstrated 25.1% better cost efficiency than the random method's 'lowest cost' when it achieved 'maximum production'.
+- **Business Impact**: 52.0% cost reduction → Profitability improvement
 
 ### ⏱️ Wait Time
 - **Meaning**: Average time parts wait at each process
-- **AI Performance**: 0.15 minutes (Random: 2.40 minutes)
-- **Business Impact**: 93.9% wait time reduction → Customer satisfaction improvement
+- **AI Performance**: Average 0.16 minutes (Random: 2.09 minutes)
+- **Business Impact**: 92.3% wait time reduction → Customer satisfaction improvement
 
 ## 🎓 Learning Value
 
