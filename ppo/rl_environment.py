@@ -38,7 +38,7 @@ class ProductionLineEnv(gym.Env):
         )
 
         # 시뮬레이션 설정
-        self.simulation_time = 30  # 빠른 학습을 위해 에피소드당 시뮬레이션 시간 단축
+        self.simulation_time = 120  # 빠른 학습을 위해 에피소드당 시뮬레이션 시간 단축
         self.max_steps = 10        # 에피소드당 최대 스텝 수
         self.current_step = 0
         self.reset()
