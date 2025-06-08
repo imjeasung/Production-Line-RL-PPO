@@ -371,7 +371,6 @@ python training_analysis_v1.py
 ```
 - View AI vs random approach comparison results in terminal and graphs
 
-Below is an example graph:
 ![production_ai_learning_curves](https://github.com/user-attachments/assets/23f0862b-ee29-43ef-ab11-abd802d9364e)
 
 
