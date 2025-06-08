@@ -208,7 +208,7 @@ apply_scenario('bottleneck_assembly')  # 병목 시나리오 적용
 
 ---
 *이 프로젝트는 AI 기술의 실용적 가치를 입증하고, 제조업 혁신에 기여하고자 하는 목적으로 개발되었습니다.*
----
+
 # 🏭 AI-Powered Production Line Optimization Simulation
 
 ## 📋 Project Overview
