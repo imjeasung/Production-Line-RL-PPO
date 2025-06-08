@@ -159,7 +159,6 @@ python training_analysis_v1.py
 ```
 - AI vs 랜덤 방식 비교 결과를 터미널과 그래프로 확인
 
-아래는 그래프 예시
 ![production_ai_learning_curves](https://github.com/user-attachments/assets/79ba37e2-2d76-4673-9489-772663ed14c7)
 
 
@@ -172,7 +171,7 @@ apply_scenario('bottleneck_assembly')  # 병목 시나리오 적용
 
 ## 📈 주요 성과 지표 해석
 ![스크린샷 2025-06-08 222249](https://github.com/user-attachments/assets/b6e1b7f4-fa34-4210-8f43-7ef81d9a480f)
-(사진은 예시입니다### 1단계: 환경 설정 및 초기화
+### 1단계: 환경 설정 및 초기화
 ```
 config.py → 시뮬레이션 파라미터 설정
 rl_environment.py → 강화학습 환경 구성
@@ -429,7 +428,6 @@ python training_analysis_v1.py
 ```
 - View AI vs random approach comparison results in terminal and graphs
 
-Below is an example graph:
 ![production_ai_learning_curves](https://github.com/user-attachments/assets/23f0862b-ee29-43ef-ab11-abd802d9364e)
 
 
