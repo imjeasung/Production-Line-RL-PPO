@@ -8,13 +8,13 @@
 ### 🤖 핵심 아이디어
 - **문제**: 생산라인에서 각 공정(가공→조립→검사)에 몇 대의 기계를 배치해야 최적의 성과를 낼 수 있을까?
 - **AI의 역할**: 실시간으로 생산 상황을 분석하고, 처리량을 최대화하면서 비용과 대기시간을 최소화하는 최적의 기계 배치 전략을 학습
-- **검증 방법**: AI 방식 vs 랜덤 선택 방식의 성능을 수치적으로 비교
+- **검증 방법**: AI 방식 vs 몬테 카를로 방법의 성능을 수치적으로 비교
 
 ### 📊 주요 성과 (실제 실행 결과)
-- **처리량**: AI가 랜덤 방식 대비 **13.0% 향상** (시간당 생산량: AI 100.9개 vs 랜덤 89.3개)
-- **운영비용**: AI가 랜덤 방식 대비 **52.0% 절감** (AI $3,760 vs 랜덤 $7,828)
-- **대기시간**: AI가 랜덤 방식 대비 **92.3% 단축** (AI 0.16분 vs 랜덤 2.09분)
-- **전체 보상**: AI가 랜덤 방식 대비 **101.8% 향상** (AI 123.7 vs 랜덤 61.3)
+- **처리량**: AI가 몬테 카를로 방법 대비 **13.0% 향상** (시간당 생산량: AI 100.9개 vs 몬테 카를로 방법 89.3개)
+- **운영비용**: AI가 몬테 카를로 방법 대비 **52.0% 절감** (AI $3,760 vs 몬테 카를로 방법 $7,828)
+- **대기시간**: AI가 몬테 카를로 방법 대비 **92.3% 단축** (AI 0.16분 vs 몬테 카를로 방법 2.09분)
+- **전체 보상**: AI가 몬테 카를로 방법 대비 **101.8% 향상** (AI 123.7 vs 몬테 카를로 방법 61.3)
 
 ## 🛠️ 기술 스택
 
@@ -84,7 +84,7 @@ class SimpleProductionAgent:
 1. **모델 초기화**: PPO 알고리즘으로 정책 네트워크 생성
 2. **경험 수집**: 환경과 상호작용하며 (상태, 행동, 보상) 데이터 축적
 3. **정책 업데이트**: 수집된 경험을 바탕으로 신경망 가중치 최적화
-4. **성능 평가**: 학습된 모델과 랜덤 선택 방식의 성능 비교
+4. **성능 평가**: 학습된 모델과 몬테 카를로 방법 선택 방식의 성능 비교
 5. **모델 저장**: 학습 완료된 AI 모델을 파일로 저장
 
 **PPO 알고리즘 선택 이유**:
@@ -95,8 +95,8 @@ class SimpleProductionAgent:
 #### 4. `training_analysis_v1.py` - 성능 분석 및 시각화 도구
 ```python
 def run_performance_analysis(self, num_episodes=100):
-    # AI vs Random 에이전트 성능 데이터 수집
-    for agent_type in ['AI', 'Random']:
+    # AI vs Monte Carlo method 에이전트 성능 데이터 수집
+    for agent_type in ['AI', 'Monte Carlo method']:
         for i in range(num_episodes):
             # 각 에피소드별 성능 지표 기록
             agent_data.append({
@@ -109,9 +109,9 @@ def run_performance_analysis(self, num_episodes=100):
 ```
 
 **핵심 동작 로직**:
-1. **데이터 수집**: AI와 랜덤 방식을 각각 100회씩 실행하여 성능 데이터 축적
+1. **데이터 수집**: AI와 몬테 카를로 방법을 각각 100회씩 실행하여 성능 데이터 축적
 2. **통계 분석**: 평균, 중간값, 표준편차 등 기술통계량 계산
-3. **비교 분석**: AI 대비 랜덤 방식의 성능 개선률을 백분율로 산출
+3. **비교 분석**: AI 대비 몬테 카를로 방법의 성능 개선률을 백분율로 산출
 4. **시각화**: 4개 차트(처리량, 비용, 대기시간, 전략분포)로 결과 표시
 5. **보고서 생성**: 터미널과 그래프를 통한 종합 성과 리포트 제공
 
@@ -133,7 +133,7 @@ rl_environment.py → 강화학습 환경 구성
 
 ### 3단계: 성능 검증
 ```
-학습된 AI vs 랜덤 선택 방식
+학습된 AI vs 몬테 카를로 방법 선택 방식
 → 200회 테스트 실행
 → 통계적 유의성 검증
 → 결과 시각화
@@ -157,7 +157,7 @@ python simple_agent_v1.py
 ```bash
 python training_analysis_v1.py
 ```
-- AI vs 랜덤 방식 비교 결과를 터미널과 그래프로 확인
+- AI vs 몬테 카를로 방법 비교 결과를 터미널과 그래프로 확인
 ![production_ai_learning_curves](https://github.com/user-attachments/assets/79ba37e2-2d76-4673-9489-772663ed14c7)
 
 ### 4. 설정 변경 (선택사항)
@@ -172,17 +172,17 @@ apply_scenario('bottleneck_assembly')  # 병목 시나리오 적용
 
 ### 🎯 처리량 (Throughput)
 - **의미**: 시간당 완성품 생산 개수
-- **AI 성과**: 시간당 생산량 100.9개 (랜덤: 89.3개/시간)
+- **AI 성과**: 시간당 생산량 100.9개 (몬테 카를로 방법: 89.3개/시간)
 - **비즈니스 임팩트**: 13.0% 생산성 향상 → 매출 직결
 
 ### 💰 운영비용 (Cost)
 - **의미**: 기계 운영에 필요한 총 비용
-- **AI 성과**: AI의 평균 운영 비용은 $3,760으로, 랜덤 방식의 평균 비용($7,828) 대비 52.0% 낮았습니다. 특히 AI는 랜덤 방식이 최대 생산량을 기록했을 때의 최저 비용보다도 25.1% 더 낮은 비용 효율성을 보였습니다.
+- **AI 성과**: AI의 평균 운영 비용은 $3,760으로, 몬테 카를로 방법의 평균 비용($7,828) 대비 52.0% 낮았습니다. 특히 AI는 몬테 카를로 방법이 최대 생산량을 기록했을 때의 최저 비용보다도 25.1% 더 낮은 비용 효율성을 보였습니다.
 - **비즈니스 임팩트**: 52.0% 비용 절감 → 수익성 개선
 
 ### ⏱️ 대기시간 (Wait Time)
 - **의미**: 부품이 각 공정에서 대기하는 평균 시간
-- **AI 성과**: 평균 0.16분 (랜덤: 2.09분)
+- **AI 성과**: 평균 0.16분 (몬테 카를로 방법: 2.09분)
 - **비즈니스 임팩트**: 92.3% 대기시간 단축 → 고객 만족도 향상
 
 ## 🎓 학습 가치
@@ -215,18 +215,18 @@ apply_scenario('bottleneck_assembly')  # 병목 시나리오 적용
 ## 📋 Project Overview
 
 ### 🎯 Project Purpose
-This project aims to **apply AI-powered optimization techniques to production line simulation** and demonstrate the effectiveness of AI compared to traditional empirical or random decision-making approaches.
+This project aims to **apply AI-powered optimization techniques to production line simulation** and demonstrate the effectiveness of AI compared to traditional empirical or Monte Carlo method decision-making approaches.
 
 ### 🤖 Core Concept
 - **Problem**: How many machines should be deployed at each production stage (Machining→Assembly→Inspection) to achieve optimal performance?
 - **AI's Role**: Analyze production situations in real-time and learn optimal machine allocation strategies that maximize throughput while minimizing costs and wait times
-- **Validation Method**: Quantitative performance comparison between AI approach vs. random selection approach
+- **Validation Method**: Quantitative performance comparison between AI approach vs. Monte Carlo method
 
 ### 📊 Key Performance Results (Actual Execution)
-- **Throughput**: AI achieved **13.0% improvement** over random approach (AI 100.9 units/hour vs Random 89.3 units/hour)
-- **Operating Cost**: AI achieved **52.0% cost reduction** compared to random approach (AI $3,760 vs Random $7,828)
-- **Wait Time**: AI achieved **92.3% wait time reduction** compared to random approach (AI 0.16 min vs Random 2.09 min)
-- **Overall Reward**: AI achieved **101.8% improvement** over random approach (AI 123.7 vs Random 61.3)
+- **Throughput**: AI achieved **13.0% improvement** over Monte Carlo method (AI 100.9 units/hour vs Monte Carlo method 89.3 units/hour)
+- **Operating Cost**: AI achieved **52.0% cost reduction** compared to Monte Carlo method (AI $3,760 vs Monte Carlo method $7,828)
+- **Wait Time**: AI achieved **92.3% wait time reduction** compared to Monte Carlo method (AI 0.16 min vs Monte Carlo method 2.09 min)
+- **Overall Reward**: AI achieved **101.8% improvement** over Monte Carlo method (AI 123.7 vs Monte Carlo method 61.3)
 
 ## 🛠️ Technology Stack
 
@@ -296,7 +296,7 @@ class SimpleProductionAgent:
 1. **Model Initialization**: Create policy network using PPO algorithm
 2. **Experience Collection**: Accumulate (state, action, reward) data through environment interaction
 3. **Policy Update**: Optimize neural network weights based on collected experience
-4. **Performance Evaluation**: Compare performance between trained model and random selection
+4. **Performance Evaluation**: Compare performance between trained model and Monte Carlo method selection
 5. **Model Saving**: Save trained AI model to file
 
 **PPO Algorithm Selection Rationale**:
@@ -307,8 +307,8 @@ class SimpleProductionAgent:
 #### 4. `training_analysis_v1.py` - Performance Analysis and Visualization Tool
 ```python
 def run_performance_analysis(self, num_episodes=100):
-    # Collect AI vs Random agent performance data
-    for agent_type in ['AI', 'Random']:
+    # Collect AI vs Monte Carlo method agent performance data
+    for agent_type in ['AI', 'Monte Carlo method']:
         for i in range(num_episodes):
             # Record performance metrics for each episode
             agent_data.append({
@@ -321,7 +321,7 @@ def run_performance_analysis(self, num_episodes=100):
 ```
 
 **Core Operation Logic**:
-1. **Data Collection**: Execute AI and random approaches 100 times each to accumulate performance data
+1. **Data Collection**: Execute AI and Monte Carlo method 100 times each to accumulate performance data
 2. **Statistical Analysis**: Calculate descriptive statistics (mean, median, standard deviation)
 3. **Comparative Analysis**: Calculate AI performance improvement rates as percentages
 4. **Visualization**: Display results through 4 charts (throughput, cost, wait time, strategy distribution)
@@ -345,7 +345,7 @@ rl_environment.py → Configure reinforcement learning environment
 
 ### Stage 3: Performance Validation
 ```
-Trained AI vs Random selection approach
+Trained AI vs Monte Carlo method selection approach
 → Execute 200 test runs
 → Statistical significance verification
 → Result visualization
@@ -369,7 +369,7 @@ python simple_agent_v1.py
 ```bash
 python training_analysis_v1.py
 ```
-- View AI vs random approach comparison results in terminal and graphs
+- View AI vs Monte Carlo method comparison results in terminal and graphs
 
 ![production_ai_learning_curves](https://github.com/user-attachments/assets/23f0862b-ee29-43ef-ab11-abd802d9364e)
 
@@ -386,17 +386,17 @@ apply_scenario('bottleneck_assembly')  # Apply bottleneck scenario
 
 ### 🎯 Throughput
 - **Meaning**: Number of finished products per hour
-- **AI Performance**: 100.9 units/hour (Random: 89.3 units/hour)
+- **AI Performance**: 100.9 units/hour (Monte Carlo method: 89.3 units/hour)
 - **Business Impact**: 13.0% productivity improvement → Direct revenue impact
 
 ### 💰 Operating Cost
 - **Meaning**: Total cost required for machine operation
-- **AI Performance**: AI's average operating cost was $3,760, which was 52.0% lower than the random method's average cost ($7,828). Notably, AI demonstrated 25.1% better cost efficiency than the random method's 'lowest cost' when it achieved 'maximum production'.
+- **AI Performance**: AI's average operating cost was $3,760, which was 52.0% lower than the Monte Carlo method method's average cost ($7,828). Notably, AI demonstrated 25.1% better cost efficiency than the Monte Carlo method method's 'lowest cost' when it achieved 'maximum production'.
 - **Business Impact**: 52.0% cost reduction → Profitability improvement
 
 ### ⏱️ Wait Time
 - **Meaning**: Average time parts wait at each process
-- **AI Performance**: Average 0.16 minutes (Random: 2.09 minutes)
+- **AI Performance**: Average 0.16 minutes (Monte Carlo method: 2.09 minutes)
 - **Business Impact**: 92.3% wait time reduction → Customer satisfaction improvement
 
 ## 🎓 Learning Value
