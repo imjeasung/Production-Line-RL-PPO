@@ -157,8 +157,6 @@ python simple_agent_v1.py
 ```bash
 python training_analysis_v1.py
 ```
-- AI vs 몬테 카를로 방법 비교 결과를 터미널과 그래프로 확인
-![production_ai_learning_curves](https://github.com/user-attachments/assets/79ba37e2-2d76-4673-9489-772663ed14c7)
 
 ### 4. 설정 변경 (선택사항)
 ```python
@@ -369,10 +367,6 @@ python simple_agent_v1.py
 ```bash
 python training_analysis_v1.py
 ```
-- View AI vs Monte Carlo method comparison results in terminal and graphs
-
-![production_ai_learning_curves](https://github.com/user-attachments/assets/23f0862b-ee29-43ef-ab11-abd802d9364e)
-
 
 ### 4. Configuration Changes (Optional)
 ```python
